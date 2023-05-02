@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incremental Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #222;
+            color: #fff;
+        }
+
+        button {
+            font-size: 24px;
+            padding: 10px 20px;
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #666;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        @media (max-width: 767px) {
+            button {
+                font-size: 18px;
+                padding: 5px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Incremental Game</h1>
+    <button id="clicker">Click me (<span id="clickerLevel">1</span> point/click)</button>
+    <p>Points: <span id="points">0</span></p>
+    <button id="upgradeClicker">Upgrade clicker (Cost: <span id="upgradeClickerCost">10</span> points)</button>
+    <p>Clicker level: <span id="clickerLevel">1</span></p>
+    <button id="buyLevel1">Buy Level 1 (Cost: 5 points)</button>
+    <p>Level 1: <span id="level1">0</span> (1 point/second)</p>
+    <button id="upgradeLevel1">Upgrade Level 1 speed (Cost: <span id="upgradeLevel1Cost">25</span> points)</button>
+    <p>Level 1 speed multiplier: <span id="level1SpeedMultiplier">1x</span></p>
+    <button id="buyLevel2">Buy Level 2 (Cost: 100 points)</button>
+    <p>Level 2: <span id="level2">0</span> (1 Level 1/second)</p>
+    <button id="upgradeLevel2">Upgrade Level 2 speed (Cost: <span id="upgradeLevel2Cost">500</span> points)</button>
+    <p>Level 2 speed multiplier: <span id="level2SpeedMultiplier">1x</span></p>
+    <button id="buyLevel3">Buy Level 3 (Cost: 1000 points)</button>
+    <p>Level 3: <span id="level3">0</span> (10 points/second)</p>
+    <script>
+        const clicker = document.getElementById("clicker");
+        const upgradeClicker = document.getElementById("upgradeClicker");
+        const upgradeClickerCostDisplay = document.getElementById("upgradeClickerCost");
+        const buyLevel1 = document.getElementById("buyLevel1");
+        const upgradeLevel1 = document.getElementById("upgradeLevel1");
+        const upgradeLevel1CostDisplay = document.getElementById("upgradeLevel1Cost");
+        const buyLevel2 = document.getElementById("buyLevel2");
+        const upgradeLevel2 = document.getElementById("upgradeLevel2");
+        const upgradeLevel2CostDisplay = document.getElementById("upgradeLevel2Cost");
+        const buyLevel3 = document.getElementById("buyLevel3");
+        const pointsDisplay = document.getElementById("points");
+        const clickerLevelDisplay = document.getElementById("clickerLevel");
+        const level1Display = document.getElementById("level1");
+        const level1SpeedMultiplierDisplay = document.getElementById("level1SpeedMultiplier");
+        const level2Display = document.getElementById("level2");
+        const level2SpeedMultiplierDisplay = document.getElementById("level2SpeedMultiplier");
+        const level3Display = document.getElementById("level3");
+
+        let points = 0;
+        let clickerLevel = 1;
+        let level1 = 0;
+        let level2 = 0;
+        let level3 = 0;
+        let level1SpeedMultiplier = 1;
+        let level2SpeedMultiplier = 1;
+        let upgradeClickerCost = 10;
+        let upgradeLevel1Cost = 25;
+        let upgradeLevel2Cost = 500;
+
+        function incrementPoints(amount) {
+            points += amount;
+            pointsDisplay.textContent = points;
+        }
+
+        function purchase(cost) {
+            if (points >= cost) {
+                points -= cost;
+                pointsDisplay.textContent = points;
+                return true;
+            }
+            return false;
+        }
+
+        clicker.addEventListener("click", () => {
+            incrementPoints(clickerLevel);
+        });
+
+        upgradeClicker.addEventListener("click", () => {
+            if (purchase(upgradeClickerCost)) {
+                clickerLevel++;
+                clickerLevelDisplay.textContent = clickerLevel;
+                upgradeClickerCost = Math.floor(upgradeClickerCost * 1.5);
+                upgradeClickerCostDisplay.textContent = upgradeClickerCost;
+            }
+        });
+
+        buyLevel1.addEventListener("click", () => {
+            if (purchase(5)) {
+                level1++;
+                level1Display.textContent = level1;
+            }
+        });
+
+        upgradeLevel1.addEventListener("click", () => {
+            if (purchase(upgradeLevel1Cost)) {
+                level1SpeedMultiplier *= 2;
+                level1SpeedMultiplierDisplay.textContent = level1SpeedMultiplier + "x";
+                upgradeLevel1Cost = Math.floor(upgradeLevel1Cost * 2);
+                upgradeLevel1CostDisplay.textContent = upgradeLevel1Cost;
+            }
+        });
+
+        buyLevel2.addEventListener("click", () => {
+            if (purchase(100)) {
+                level2++;
+                level2Display.textContent = level2;
+            }
+        });
+
+        upgradeLevel2.addEventListener("click", () => {
+            if (purchase(upgradeLevel2Cost)) {
+                level2SpeedMultiplier *= 2;
+                level2SpeedMultiplierDisplay.textContent = level2SpeedMultiplier + "x";
+                upgradeLevel2Cost = Math.floor(upgradeLevel2Cost * 2);
+                upgradeLevel2CostDisplay.textContent = upgradeLevel2Cost;
+            }
+        });
+
+        buyLevel3.addEventListener("click", () => {
+            if (purchase(1000)) {
+                level3++;
+                level3Display.textContent = level3;
+            }
+        });
+
+        function gameLoop() {
+            incrementPoints(level1 * level1SpeedMultiplier);
+            level1 += level2 * level2SpeedMultiplier;
+            level1Display.textContent = level1;
+            incrementPoints(level3 * 10);
+            setTimeout(gameLoop, 10);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
