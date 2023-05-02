@@ -23,6 +23,10 @@
             cursor: pointer;
         }
 
+        .hidden {
+            display: none;
+        }
+
         button:hover {
             background-color: #555;
         }
@@ -36,126 +40,220 @@
     </style>
 </head>
 <body>
-    <h1>Incremental Game</h1>
-    <button id="clicker">Click me (<span id="clickerLevel">1</span> point/click)</button>
-    <p>Points: <span id="points">0</span></p>
-    <button id="upgradeClicker">Upgrade clicker (Cost: <span id="upgradeClickerCost">10</span> points)</button>
-    <p>Clicker level: <span id="clickerLevel">1</span></p>
-    <button id="buyLevel1">Buy Level 1 (Cost: 5 points)</button>
-    <p>Level 1: <span id="level1">0</span> (1 point/second)</p>
-    <button id="upgradeLevel1">Upgrade Level 1 speed (Cost: <span id="upgradeLevel1Cost">25</span> points)</button>
-    <p>Level 1 speed multiplier: <span id="level1SpeedMultiplier">1x</span></p>
-    <button id="buyLevel2">Buy Level 2 (Cost: 100 points)</button>
-    <p>Level 2: <span id="level2">0</span> (1 Level 1/second)</p>
-    <button id="upgradeLevel2">Upgrade Level 2 speed (Cost: <span id="upgradeLevel2Cost">500</span> points)</button>
-    <p>Level 2 speed multiplier: <span id="level2SpeedMultiplier">1x</span></p>
-    <button id="buyLevel3">Buy Level 3 (Cost: 1000 points)</button>
-    <p>Level 3: <span id="level3">0</span> (10 points/second)</p>
-    <script>
-        const clicker = document.getElementById("clicker");
-        const upgradeClicker = document.getElementById("upgradeClicker");
-        const upgradeClickerCostDisplay = document.getElementById("upgradeClickerCost");
-        const buyLevel1 = document.getElementById("buyLevel1");
-        const upgradeLevel1 = document.getElementById("upgradeLevel1");
-        const upgradeLevel1CostDisplay = document.getElementById("upgradeLevel1Cost");
-        const buyLevel2 = document.getElementById("buyLevel2");
-        const upgradeLevel2 = document.getElementById("upgradeLevel2");
-        const upgradeLevel2CostDisplay = document.getElementById("upgradeLevel2Cost");
-        const buyLevel3 = document.getElementById("buyLevel3");
-        const pointsDisplay = document.getElementById("points");
-        const clickerLevelDisplay = document.getElementById("clickerLevel");
-        const level1Display = document.getElementById("level1");
-        const level1SpeedMultiplierDisplay = document.getElementById("level1SpeedMultiplier");
-        const level2Display = document.getElementById("level2");
-        const level2SpeedMultiplierDisplay = document.getElementById("level2SpeedMultiplier");
-        const level3Display = document.getElementById("level3");
+<h1>Incremental Game</h1>
+<button id="toggleResearchView">Toggle Research View</button>
+<div id="researchView" class="hidden">
+    <h2>Research</h2>
+    <button id="researchSpeed">Research Speed Boost (Cost: 500 points)</button>
+    <p>Speed Boost: <span id="speedBoost">0%</span></p>
+</div>
+<button id="clicker">Click me (<span id="clickerValue">1</span> point/click)</button>
+<p>Points: <span id="points">0</span></p>
+<button id="upgradeClicker">Upgrade clicker (Cost: <span id="upgradeClickerCost">10</span> points)</button>
+<p>Clicker level: <span id="clickerLevel">1</span></p>
+<button id="buyLevel1">Buy Level 1 (Cost: 5 points)</button>
+<p>Level 1: <span id="level1">0</span> (1 point/second)</p>
+<button id="upgradeLevel1">Upgrade Level 1 speed (Cost: <span id="upgradeLevel1Cost">25</span> points)</button>
+<p>Level 1 speed multiplier: <span id="level1SpeedMultiplier">1x</span></p>
+<button id="buyLevel2">Buy Level 2 (Cost: 100 points)</button>
+<p>Level 2: <span id="level2">0</span> (1 Level 1/second)</p>
+<button id="upgradeLevel2">Upgrade Level 2 speed (Cost: <span id="upgradeLevel2Cost">500</span> points)</button>
+<p>Level 2 speed multiplier: <span id="level2SpeedMultiplier">1x</span></p>
+<button id="buyLevel3">Buy Level 3 (Cost: 1000 points)</button>
+<p>Level 3: <span id="level3">0</span> (10 points/second)</p>
+<button id="upgradeLevel3">Upgrade Level 3 speed (Cost: <span id="upgradeLevel3Cost">500</span> points)</button>
+<p>Level 3 speed multiplier: <span id="level3SpeedMultiplier">1x</span></p>
+<button id="prestige">Prestige (Cost: 1000 points)</button>
+<p>Prestige multiplier: <span id="prestigeMultiplier">1x</span></p>
 
-        let points = 0;
-        let clickerLevel = 1;
-        let level1 = 0;
-        let level2 = 0;
-        let level3 = 0;
-        let level1SpeedMultiplier = 1;
-        let level2SpeedMultiplier = 1;
-        let upgradeClickerCost = 10;
-        let upgradeLevel1Cost = 25;
-        let upgradeLevel2Cost = 500;
+<script>
+    const clicker = document.getElementById("clicker");
+    const upgradeClicker = document.getElementById("upgradeClicker");
+    const upgradeClickerCostDisplay = document.getElementById("upgradeClickerCost");
+    const buyLevel1 = document.getElementById("buyLevel1");
+    const upgradeLevel1 = document.getElementById("upgradeLevel1");
+    const upgradeLevel1CostDisplay = document.getElementById("upgradeLevel1Cost");
+    const buyLevel2 = document.getElementById("buyLevel2");
+    const upgradeLevel2 = document.getElementById("upgradeLevel2");
+    const upgradeLevel2CostDisplay = document.getElementById("upgradeLevel2Cost");
+    const buyLevel3 = document.getElementById("buyLevel3");
+    const upgradeLevel3 = document.getElementById("upgradeLevel3");
+    const upgradeLevel3CostDisplay = document.getElementById("upgradeLevel3Cost");
+    const pointsDisplay = document.getElementById("points");
+    const clickerLevelDisplay = document.getElementById("clickerLevel");
+    const level1Display = document.getElementById("level1");
+    const level1SpeedMultiplierDisplay = document.getElementById("level1SpeedMultiplier");
+    const level2Display = document.getElementById("level2");
+    const level2SpeedMultiplierDisplay = document.getElementById("level2SpeedMultiplier");
+    const level3Display = document.getElementById("level3");
+    const level3SpeedMultiplierDisplay = document.getElementById("level3SpeedMultiplier");
+    const prestigeButton = document.getElementById("prestige");
+    const prestigeMultiplierDisplay = document.getElementById("prestigeMultiplier");
+    const toggleResearchView = document.getElementById("toggleResearchView");
+    const researchView = document.getElementById("researchView");
+    const researchSpeedButton = document.getElementById("researchSpeed");
+    const speedBoostDisplay = document.getElementById("speedBoost");
 
-        function incrementPoints(amount) {
-            points += amount;
-            pointsDisplay.textContent = points;
+    let points = 0;
+    let clickerLevel = 1;
+    let level1 = 0;
+    let level2 = 0;
+    let level3 = 0;
+    let l1Points = 0;
+    let l2Points = 0;
+    let l3Points = 0;
+    let level1SpeedMultiplier = 1;
+    let level2SpeedMultiplier = 1;
+    let level3SpeedMultiplier = 1;
+    let upgradeClickerCost = 10;
+    let upgradeLevel1Cost = 25;
+    let upgradeLevel2Cost = 500;
+    let upgradeLevel3Cost = 1500;
+    let prestigeMultiplier = 1;
+    let prestigeCost = 1000;
+    let speedBoost = 0;
+
+    clicker.addEventListener("click", () => {
+        incrementPoints(clickerLevel);
+    });
+
+    upgradeClicker.addEventListener("click", () => {
+        if (purchase(upgradeClickerCost)) {
+            clickerLevel++;
+            clickerLevelDisplay.textContent = clickerLevel;
+            upgradeClickerCost = Math.floor(upgradeClickerCost * 1.5);
+            upgradeClickerCostDisplay.textContent = upgradeClickerCost;
         }
+    });
 
-        function purchase(cost) {
-            if (points >= cost) {
-                points -= cost;
-                pointsDisplay.textContent = points;
-                return true;
-            }
-            return false;
-        }
-
-        clicker.addEventListener("click", () => {
-            incrementPoints(clickerLevel);
-        });
-
-        upgradeClicker.addEventListener("click", () => {
-            if (purchase(upgradeClickerCost)) {
-                clickerLevel++;
-                clickerLevelDisplay.textContent = clickerLevel;
-                upgradeClickerCost = Math.floor(upgradeClickerCost * 1.5);
-                upgradeClickerCostDisplay.textContent = upgradeClickerCost;
-            }
-        });
-
-        buyLevel1.addEventListener("click", () => {
-            if (purchase(5)) {
-                level1++;
-                level1Display.textContent = level1;
-            }
-        });
-
-        upgradeLevel1.addEventListener("click", () => {
-            if (purchase(upgradeLevel1Cost)) {
-                level1SpeedMultiplier *= 2;
-                level1SpeedMultiplierDisplay.textContent = level1SpeedMultiplier + "x";
-                upgradeLevel1Cost = Math.floor(upgradeLevel1Cost * 2);
-                upgradeLevel1CostDisplay.textContent = upgradeLevel1Cost;
-            }
-        });
-
-        buyLevel2.addEventListener("click", () => {
-            if (purchase(100)) {
-                level2++;
-                level2Display.textContent = level2;
-            }
-        });
-
-        upgradeLevel2.addEventListener("click", () => {
-            if (purchase(upgradeLevel2Cost)) {
-                level2SpeedMultiplier *= 2;
-                level2SpeedMultiplierDisplay.textContent = level2SpeedMultiplier + "x";
-                upgradeLevel2Cost = Math.floor(upgradeLevel2Cost * 2);
-                upgradeLevel2CostDisplay.textContent = upgradeLevel2Cost;
-            }
-        });
-
-        buyLevel3.addEventListener("click", () => {
-            if (purchase(1000)) {
-                level3++;
-                level3Display.textContent = level3;
-            }
-        });
-
-        function gameLoop() {
-            incrementPoints(level1 * level1SpeedMultiplier);
-            level1 += level2 * level2SpeedMultiplier;
+    buyLevel1.addEventListener("click", () => {
+        if (purchase(5)) {
+            level1++;
             level1Display.textContent = level1;
-            incrementPoints(level3 * 10);
-            setTimeout(gameLoop, 10);
         }
+    });
 
-        gameLoop();
-    </script>
+    upgradeLevel1.addEventListener("click", () => {
+        if (purchase(upgradeLevel1Cost)) {
+            level1SpeedMultiplier *= 2;
+            level1SpeedMultiplierDisplay.textContent = level1SpeedMultiplier + "x";
+            upgradeLevel1Cost = Math.floor(upgradeLevel1Cost * 2);
+            upgradeLevel1CostDisplay.textContent = upgradeLevel1Cost;
+        }
+    });
+
+    buyLevel2.addEventListener("click", () => {
+        if (purchase(100)) {
+            level2++;
+            level2Display.textContent = level2;
+        }
+    });
+
+    upgradeLevel2.addEventListener("click", () => {
+        if (purchase(upgradeLevel2Cost)) {
+            level2SpeedMultiplier *= 2;
+            level2SpeedMultiplierDisplay.textContent = level2SpeedMultiplier + "x";
+            upgradeLevel2Cost = Math.floor(upgradeLevel2Cost * 2);
+            upgradeLevel2CostDisplay.textContent = upgradeLevel2Cost;
+        }
+    });
+
+    buyLevel3.addEventListener("click", () => {
+        if (purchase(1000)) {
+            level3++;
+            level3Display.textContent = level3;
+        }
+    });
+
+    upgradeLevel3.addEventListener("click", () => {
+        if (purchase(upgradeLevel3Cost)) {
+            level3SpeedMultiplier *= 2;
+            level3SpeedMultiplierDisplay.textContent = level3SpeedMultiplier + "x";
+            upgradeLevel3Cost = Math.floor(upgradeLevel3Cost * 2);
+            upgradeLevel3CostDisplay.textContent = upgradeLevel3Cost;
+        }
+    });
+
+    prestigeButton.addEventListener("click", () => {
+        if (purchase(prestigeCost)) {
+            prestigeMultiplier++;
+            prestigeMultiplierDisplay.textContent = prestigeMultiplier + "x";
+            resetGame();
+        }
+    });
+
+    toggleResearchView.addEventListener("click", () => {
+        researchView.classList.toggle("hidden");
+    });
+
+    researchSpeedButton.addEventListener("click", () => {
+        if (purchase(500)) {
+            speedBoost += 10;
+            speedBoostDisplay.textContent = speedBoost + "%";
+        }
+    });
+
+    function purchase(cost) {
+        if (points >= cost) {
+            points -= cost;
+            pointsDisplay.textContent = points;
+            return true;
+        }
+        return false;
+    }
+
+    function resetGame() {
+        points = 0;
+        clickerLevel = 1;
+        level1 = 0;
+        level2 = 0;
+        level3 = 0;
+        level1SpeedMultiplier = 1;
+        level2SpeedMultiplier = 1;
+        level3SpeedMultiplier = 1;
+        upgradeClickerCost = 10;
+        upgradeLevel1Cost = 25;
+        upgradeLevel2Cost = 500;
+        upgradeLevel3Cost = 1500;
+        speedBoost = 0;
+        updateAllDisplays();
+    }
+
+    function updateAllDisplays() {
+        pointsDisplay.textContent = points;
+        clickerLevelDisplay.textContent = clickerLevel;
+        level1Display.textContent = level1;
+        level2Display.textContent = level2;
+        level3Display.textContent = level3;
+        level1SpeedMultiplierDisplay.textContent = level1SpeedMultiplier + "x";
+        level2SpeedMultiplierDisplay.textContent = level2SpeedMultiplier + "x";
+        level3SpeedMultiplierDisplay.textContent = level3SpeedMultiplier + "x";
+        upgradeClickerCostDisplay.textContent = upgradeClickerCost;
+        upgradeLevel1CostDisplay.textContent = upgradeLevel1Cost;
+        upgradeLevel2CostDisplay.textContent = upgradeLevel2Cost;
+        upgradeLevel3CostDisplay.textContent = upgradeLevel3Cost;
+        prestigeMultiplierDisplay.textContent = prestigeMultiplier + "x";
+        prestigeCost = 1000 * prestigeMultiplier;
+        speedBoostDisplay.textContent = speedBoost + "%";
+    }
+
+    function incrementPoints(amount) {
+        points += amount * prestigeMultiplier;
+        pointsDisplay.textContent = points;
+    }
+
+    function gameLoop() {
+        level1 += level2 * level2SpeedMultiplier;
+        level2 += level3 * level3SpeedMultiplier;
+        l1Points = level1 * level1SpeedMultiplier * (1 + speedBoost / 100);
+        l2Points = level2 * level2SpeedMultiplier * (1 + speedBoost / 100);
+        l3Points = level3 * level3SpeedMultiplier * (1 + speedBoost / 100);
+        incrementPoints(l1Points + l2Points + l3Points);
+        updateAllDisplays();
+        setTimeout(gameLoop, 100)
+    }
+
+    gameLoop();
+</script>
 </body>
 </html>
